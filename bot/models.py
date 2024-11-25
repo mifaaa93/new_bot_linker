@@ -142,4 +142,27 @@ class BaseTable(models.Model):
 
         return f"{self.user} - {self.link}"
 
+
+class DaysSummary(models.Model):
+    '''
+    статистика по дням
+    '''
+    class Meta:
+        abstract = False
+        verbose_name = "Дни"
+        verbose_name_plural = "Дни"
+    
+
+    date = models.DateField("Дата", unique=True)
+
+
+    @property
+    def _write(self) -> int:
+        '''
+        '''
+        return BaseTable.objects.filter(
+            date__date=self.date,
+            write=True,
+        ).count()
+
     

@@ -5,7 +5,7 @@ from django.utils.html import format_html
 
 # Register your models here.
 from datetime import date
-from bot.models import User, Link, BaseTable
+from bot.models import User, Link, BaseTable, DaysSummary
 
 
 class DecadeBornListFilter(admin.SimpleListFilter):
@@ -114,6 +114,11 @@ class LinkAdmin(admin.ModelAdmin):
         'name',
         'invite_link',
         ]
+    list_editable=[
+        "ads_price",
+        "date",
+        ]
+    
     list_display = [
         'invite_link',
         'name',
@@ -131,59 +136,56 @@ class LinkAdmin(admin.ModelAdmin):
         #DecadeBornListFilter,
         ]
     
+    @admin.display(description='Подписалось')
     def subs(self, obj: Link) -> str:
         '''
         подписалось
         '''
         return obj._subs
 
-    subs.short_description = "Подписалось"
 
+    @admin.display(description='Написало')
     def write(self, obj: Link) -> str:
         '''
         Написало
         '''
         return obj._write
 
-    write.short_description = "Написало"
-
+    @admin.display(description='Вступило в VIP')
     def join_vip(self, obj: Link) -> str:
         '''
         Вступило
         '''
         return obj._join_vip
 
-    join_vip.short_description = "Вступило в VIP"
 
-
+    @admin.display(description='Цена ПДП')
     def subs_price(self, obj: Link) -> str:
         '''
         подписалось
         '''
         return obj._subs_price
 
-    subs_price.short_description = "Цена ПДП"
 
+    @admin.display(description="Цена Написало")
     def write_price(self, obj: Link) -> str:
         '''
         подписалось
         '''
         return obj._write_price
 
-    write_price.short_description = "Цена Написало"
 
+    @admin.display(description="Цена Вступило в VIP")
     def join_vip_price(self, obj: Link) -> str:
         '''
         подписалось
         '''
         return obj._join_vip_price
 
-    join_vip_price.short_description = "Цена Вступило в VIP"
-    
 
 class BaseTableAdmin(admin.ModelAdmin):
     
-
+    date_hierarchy = 'date'
 
     readonly_fields = [
         ]
@@ -196,8 +198,11 @@ class BaseTableAdmin(admin.ModelAdmin):
         ]
     
     exclude = []
-    list_display_links = ["id", "date", "write", "join_chat",]
-
+    list_display_links = ["id", "date",]
+    list_editable=[
+        "write",
+        "join_chat",
+        ]
     list_display = [
         "id",
         "user_link",
@@ -214,23 +219,46 @@ class BaseTableAdmin(admin.ModelAdmin):
         "date",
         ]
     
+    @admin.display(description='Юзер', ordering='user')
     def user_link(self, obj: BaseTable):
 
         link = reverse("admin:bot_user_change", args=[obj.user.user_id])
         return format_html('<a href="{}">{}</a>', link, str(obj.user))
 
-    user_link.short_description = 'Юзер'
-    user_link.admin_order_field = 'user'
-
+    @admin.display(description='Ссылка', ordering='link')
     def link_link(self, obj: BaseTable):
 
         link = reverse("admin:bot_link_change", args=[obj.link.id])
         return format_html('<a href="{}">{}</a>', link, str(obj.link))
 
-    link_link.short_description = 'Юзер'
-    link_link.admin_order_field = 'user'
+
+class DaysSummaryAdmin(admin.ModelAdmin):
+
+    date_hierarchy = 'date'
+    ordering = ['-date']
+    readonly_fields = [
+        'date',
+        ]
+
+    exclude = []
+    search_fields = [
+        ]
+    list_display = [
+        'date',
+        'write',
+        ]
+    
+    list_filter = [
+        #DecadeBornListFilter,
+        ]
+    
+    @admin.display(description='Написало')
+    def write(self, obj:DaysSummary) -> int:
+
+        return obj._write
 
 
+admin.site.register(DaysSummary, DaysSummaryAdmin)
 admin.site.register(Link, LinkAdmin)
 admin.site.register(User, UserAdmin)
 admin.site.register(BaseTable, BaseTableAdmin)

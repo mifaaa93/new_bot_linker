@@ -1,10 +1,7 @@
-from django.core.management.base import BaseCommand
-
 import telebot
 from telebot.util import smart_split, antiflood
-from telebot.types import Message, ChatMemberUpdated, CallbackQuery, ChatInviteLink, ChatJoinRequest
+from telebot.types import Message, ChatMemberUpdated, CallbackQuery, ChatJoinRequest
 
-from datetime import datetime
 from threading import Thread
 from time import sleep
 
@@ -22,10 +19,10 @@ logging.basicConfig(
     format="%(asctime)s %(funcName)s %(levelname)s %(message)s")
 
 
-bot = telebot.TeleBot(BOT_TOKEN, num_threads=10, parse_mode='HTML', disable_web_page_preview=True)
+bot = telebot.TeleBot(BOT_TOKEN, num_threads=3, parse_mode='HTML', disable_web_page_preview=True)
 
 
-allowed_updates = ['message', 'chat_member', 'callback_query', "chat_join_request",]
+allowed_updates = ['message', 'chat_member', 'callback_query',]
 
 
 
