@@ -2,7 +2,22 @@ from django.db import models
 
 # Create your models here.
 
+class Buyer(models.Model):
+    '''
+    Закупщик
+    '''
+    class Meta:
+        abstract = False
+        verbose_name = "Закупщик"
+        verbose_name_plural = "Закупщик"
 
+    name = models.CharField("Имя", max_length=64, blank=False, editable=True, null=False)
+
+
+    def __str__(self):
+
+        return f"{self.name}"
+    
 
 class User(models.Model):
     '''
@@ -46,8 +61,13 @@ class Link(models.Model):
     ads_price = models.IntegerField("Цена Рекламы", default=None, null=True, blank=True)
     date = models.DateField("Дата", default=None, null=True, blank=True)
 
+    buyer = models.ForeignKey(verbose_name="Закупщик", to=Buyer, null=True, on_delete=models.SET_NULL, default=None)
+
     def __str__(self):
 
+        if not self.name:
+            return self.invite_link
+        
         return f"{self.name} {self.invite_link}"
     
     @property

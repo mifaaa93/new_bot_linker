@@ -5,7 +5,7 @@ from django.utils.html import format_html
 
 # Register your models here.
 from datetime import date
-from bot.models import User, Link, BaseTable, DaysSummary
+from bot.models import User, Link, BaseTable, DaysSummary, Buyer
 
 
 class DecadeBornListFilter(admin.SimpleListFilter):
@@ -117,6 +117,7 @@ class LinkAdmin(admin.ModelAdmin):
     list_editable=[
         "ads_price",
         "date",
+        "buyer",
         ]
     
     list_display = [
@@ -130,10 +131,13 @@ class LinkAdmin(admin.ModelAdmin):
         "write_price",
         "join_vip_price",
         'date',
+        'buyer',
         ]
     
     list_filter = [
-        #DecadeBornListFilter,
+        'buyer',
+        #"invite_link",
+        #'name',
         ]
     
     @admin.display(description='Подписалось')
@@ -258,6 +262,31 @@ class DaysSummaryAdmin(admin.ModelAdmin):
         return obj._write
 
 
+class BuyerAdmin(admin.ModelAdmin):
+    
+    readonly_fields = [
+        ]
+
+    exclude = []
+    search_fields = [
+        'name',
+        ]
+    list_display = [
+        'name',
+        ]
+    
+    list_filter = [
+        #DecadeBornListFilter,
+        ]
+    
+    @admin.display(description='Написало')
+    def write(self, obj:DaysSummary) -> int:
+
+        return obj._write
+
+
+
+admin.site.register(Buyer, BuyerAdmin)
 admin.site.register(DaysSummary, DaysSummaryAdmin)
 admin.site.register(Link, LinkAdmin)
 admin.site.register(User, UserAdmin)
