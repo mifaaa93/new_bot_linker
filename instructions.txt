@@ -2,6 +2,9 @@
 apt install -y python3-venv 
 apt install -y build-essential libssl-dev libffi-dev python3-dev
 
+test
+test1
+
 cd real_estate_bot/
 
 python3 -m venv venv
