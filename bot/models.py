@@ -61,7 +61,13 @@ class Link(models.Model):
     ads_price = models.IntegerField("Цена Рекламы", default=None, null=True, blank=True)
     date = models.DateField("Дата", default=None, null=True, blank=True)
 
-    buyer = models.ForeignKey(verbose_name="Закупщик", to=Buyer, null=True, on_delete=models.SET_NULL, default=None)
+    buyer = models.ForeignKey(
+        verbose_name="Закупщик",
+        to=Buyer,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        default=None)
 
     def __str__(self):
 
