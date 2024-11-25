@@ -81,9 +81,10 @@ def turn_on_write(user: User) -> None:
     '''
     отмечаем что юзер написал на последней строке
     '''
-    last_row = BaseTable.objects.filter(user=user).last()
-    if last_row is not None:
-        last_row.make_write()
+    if BaseTable.objects.filter(user=user, write=True).first() is None:
+        last_row = BaseTable.objects.filter(user=user).last()
+        if last_row is not None:
+            last_row.make_write()
 
 
 def turn_on_join_VIP(user: User) -> None:
