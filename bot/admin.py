@@ -241,7 +241,7 @@ class DaysSummaryAdmin(admin.ModelAdmin):
     date_hierarchy = 'date'
     ordering = ['-date']
     readonly_fields = [
-        'date',
+        #'date',
         ]
 
     exclude = []
