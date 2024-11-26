@@ -78,9 +78,28 @@ def update_users(message: Message, task: int) -> None:
     '''
     '''
     users = set([user.strip() for user in message.text.split("\n") if user.strip()])
-    counter = confirm(task, users)
+    if task <= 4:
+        counter = confirm(task, users)
+        bot.reply_to(message, f"Изменено юзеров: {counter}", reply_markup=admin_menu_keyboard)
+    elif task == 5:
+        # проверка юзеров по базе
+        resp = count_users(users)
+        for text in smart_split(resp):
+            antiflood(
+                function=bot.reply_to,
+                message=message,
+                text=text)
+    
+    elif task == 6:
+        # проверка юзеров по статсусам
+        resp = status_users(users)
+        for text in smart_split(resp):
+            antiflood(
+                function=bot.reply_to,
+                message=message,
+                text=text)
+            
 
-    bot.reply_to(message, f"Изменено юзеров: {counter}", reply_markup=admin_menu_keyboard)
     
 
 @bot.chat_member_handler(func=is_target_channel)
@@ -171,6 +190,32 @@ def admin_btn(message: Message) -> None:
                 callback=wait_user_name,
                 msg_id=msg.id,
                 tasks=4
+            )
+        elif message.text == check_users_btn_text:
+            # вводим юзернейм или юзерайди
+            msg = bot.send_message(
+                message.chat.id,
+                text=check_usersnames_text,
+                reply_markup=cencel_btn
+            )
+            bot.register_next_step_handler_by_chat_id(
+                chat_id=message.chat.id,
+                callback=wait_user_name,
+                msg_id=msg.id,
+                tasks=5
+            )
+        elif message.text == check_users_status_btn_text:
+            # вводим юзернейм или юзерайди
+            msg = bot.send_message(
+                message.chat.id,
+                text=check_usersnames_status_text,
+                reply_markup=cencel_btn
+            )
+            bot.register_next_step_handler_by_chat_id(
+                chat_id=message.chat.id,
+                callback=wait_user_name,
+                msg_id=msg.id,
+                tasks=6
             )
         
 

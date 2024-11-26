@@ -70,7 +70,7 @@ def get_user_by_username_or_id(user_name_or_id: str) -> User:
             user_id = int(user_name_or_id)
             user = User.objects.get(user_id=user_id)
         else:
-            user_name = user_name_or_id.replace("@")
+            user_name = user_name_or_id.replace("@", '')
             user = User.objects.get(user_name=user_name)
     except Exception as e:
         pass
@@ -134,3 +134,37 @@ def confirm(task: int, users: set[str]) -> int:
             counter += 1
     
     return counter
+
+
+def count_users(users: set[str]) -> str:
+    '''
+    '''
+    res = ''
+    for user_name_or_id in users:
+        user = get_user_by_username_or_id(user_name_or_id)
+        if user is not None:
+            counter = BaseTable.objects.filter(user=user).count()
+            res += f"{user_name_or_id} - {counter}\n"
+        else:
+            res += f"{user_name_or_id} - ❌\n"
+    return res
+
+
+def status_users(users: set[str]) -> str:
+    '''
+    '''
+    res = ''
+    for user_name_or_id in users:
+        user = get_user_by_username_or_id(user_name_or_id)
+        if user is None:
+            res += f"{user_name_or_id} - ❌\n"
+        else:
+            w, v = '💤', '💤'
+            bases = BaseTable.objects.filter(user=user)
+            for b in bases:
+                if b.write:
+                    w = "📝"
+                if b.join_chat:
+                    v = "✅"
+            res += f"{user_name_or_id} - {w} {v}\n"
+    return res
