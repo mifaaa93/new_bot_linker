@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models import Sum
+from django.db.models.query import QuerySet
 
 # Create your models here.
 
@@ -183,12 +185,53 @@ class DaysSummary(models.Model):
 
 
     @property
-    def _write(self) -> int:
+    def get_all_links(self) -> QuerySet[Link]:
         '''
+        все ссылки за указаную дату
+        '''
+        return Link.objects.filter(
+            date=self.date
+        )
+
+
+    @property
+    def _buy_summa(self) -> int:
+        '''
+        сумма закупов ссылок по дате
+        '''
+        return self.get_all_links.filter(
+            ads_price__isnull=False
+        ).aggregate(Sum("ads_price")).get("ads_price__sum", 0)
+    
+
+    @property
+    def _PDP_summa(self) -> int:
+        '''
+        количество подписчиков по ссылкам с этой датой
+        '''
+        return sum([link._subs for link in self.get_all_links])
+
+    @property
+    def _write_summa(self) -> int:
+        '''
+        количество кто написал по ссылкам с этой датой
+        '''
+        return sum([link._write for link in self.get_all_links])
+    
+    @property
+    def _VIP_summa(self) -> int:
+        '''
+        количество кто вступил в вип по ссылкам с этой датой
+        '''
+        return sum([link._join_vip for link in self.get_all_links])
+
+
+    @property
+    def _PDP_total_summa(self) -> int:
+        '''
+        количество подписчиков за этот день
         '''
         return BaseTable.objects.filter(
-            date__date=self.date,
-            write=True,
+            date__date=self.date
         ).count()
-
     

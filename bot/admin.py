@@ -249,18 +249,42 @@ class DaysSummaryAdmin(admin.ModelAdmin):
         ]
     list_display = [
         'date',
-        'write',
+        'buy_summa',
+        'PDP_summa',
+        'write_summa',
+        'VIP_summa',
+        'PDP_total_summa',
         ]
     
     list_filter = [
         #DecadeBornListFilter,
         ]
     
+
+    @admin.display(description='Сума закупа')
+    def buy_summa(self, obj: DaysSummary) -> int:
+
+        return obj._buy_summa
+    
+    @admin.display(description='ПДП')
+    def PDP_summa(self, obj: DaysSummary) -> int:
+
+        return obj._PDP_summa
+    
     @admin.display(description='Написало')
-    def write(self, obj:DaysSummary) -> int:
+    def write_summa(self, obj: DaysSummary) -> int:
 
-        return obj._write
+        return obj._write_summa
+    
+    @admin.display(description='VIP')
+    def VIP_summa(self, obj: DaysSummary) -> int:
 
+        return obj._VIP_summa
+    
+    @admin.display(description='ПДП база')
+    def PDP_total_summa(self, obj: DaysSummary) -> int:
+
+        return obj._PDP_total_summa
 
 class BuyerAdmin(admin.ModelAdmin):
     
