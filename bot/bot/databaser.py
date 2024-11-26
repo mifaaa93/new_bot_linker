@@ -84,7 +84,16 @@ def turn_on_write(user: User) -> None:
     if BaseTable.objects.filter(user=user, write=True).first() is None:
         last_row = BaseTable.objects.filter(user=user).last()
         if last_row is not None:
-            last_row.make_write()
+            last_row.make_write(True)
+
+
+def turn_off_write(user: User) -> None:
+    '''
+    '''
+    rows = BaseTable.objects.filter(user=user)
+    for row in rows:
+        row.make_write(False)
+
 
 
 def turn_on_join_VIP(user: User) -> None:
@@ -92,13 +101,22 @@ def turn_on_join_VIP(user: User) -> None:
     '''
     rows = BaseTable.objects.filter(user=user)
     for row in rows:
-        row.make_join_VIP()
+        row.make_join_VIP(True)
+
+def turn_off_join_VIP(user: User) -> None:
+    '''
+    '''
+    rows = BaseTable.objects.filter(user=user)
+    for row in rows:
+        row.make_join_VIP(False)
 
 
 def confirm(task: int, users: set[str]) -> int:
     '''
     если task == 1 обновляем возле последней записи с юзером, что он написал
     если task == 2 обновляем везде для юзера что он вступил в ВИП
+    если task == 3 обновляем для юзера что он написал False
+    если task == 4 обновляем везде для юзера что он вступил в ВИП False
     '''
     counter = 0
     for user_name_or_id in users:
@@ -108,6 +126,11 @@ def confirm(task: int, users: set[str]) -> int:
                 turn_on_write(user)
             elif task == 2:
                 turn_on_join_VIP(user)
+            elif task == 3:
+                turn_off_write(user)
+            elif task == 4:
+                turn_off_join_VIP(user)
+                
             counter += 1
     
     return counter

@@ -152,19 +152,19 @@ class BaseTable(models.Model):
     join_chat = models.BooleanField("Вступил в VIP", default=False)
 
 
-    def make_write(self) -> None:
+    def make_write(self, val: bool=True) -> None:
         '''
         '''
-        if not self.write:
-            self.write = True
+        if self.write != val:
+            self.write = val
             self.save(update_fields=["write"])
     
 
-    def make_join_VIP(self) -> None:
+    def make_join_VIP(self, val: bool=True) -> None:
         '''
         '''
-        if not self.join_chat:
-            self.join_chat = True
+        if self.join_chat != val:
+            self.join_chat = val
             self.save(update_fields=["join_chat"])
 
 

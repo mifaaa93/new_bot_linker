@@ -49,7 +49,7 @@ def rm_btns(chat_id: int, msg_id: int) -> None:
         pass
 
 
-def wait_user_name(message: Message, msg_id: int) -> None:
+def wait_user_name(message: Message, msg_id: int, tasks: int=2) -> None:
     '''
     ждем ввода юзернеймов для подтверждения ВИП
     '''
@@ -68,7 +68,7 @@ def wait_user_name(message: Message, msg_id: int) -> None:
     
     t = Thread(
         target=update_users,
-        args=(message, 2)
+        args=(message, tasks)
     )
     t.start()
 
@@ -80,7 +80,7 @@ def update_users(message: Message, task: int) -> None:
     users = set([user.strip() for user in message.text.split("\n") if user.strip()])
     counter = confirm(task, users)
 
-    bot.reply_to(message, f"Добавлено юзеров: {counter}", reply_markup=admin_menu_keyboard)
+    bot.reply_to(message, f"Изменено юзеров: {counter}", reply_markup=admin_menu_keyboard)
     
 
 @bot.chat_member_handler(func=is_target_channel)
@@ -143,8 +143,36 @@ def admin_btn(message: Message) -> None:
             bot.register_next_step_handler_by_chat_id(
                 chat_id=message.chat.id,
                 callback=wait_user_name,
-                msg_id=msg.id
+                msg_id=msg.id,
+                tasks=2
             )
+        elif message.text == del_write_user_btn_text:
+            # вводим юзернейм или юзерайди
+            msg = bot.send_message(
+                message.chat.id,
+                text=send_del_vip_user_names_text,
+                reply_markup=cencel_btn
+            )
+            bot.register_next_step_handler_by_chat_id(
+                chat_id=message.chat.id,
+                callback=wait_user_name,
+                msg_id=msg.id,
+                tasks=3
+            )
+        elif message.text == del_vip_user_btn_text:
+            # вводим юзернейм или юзерайди
+            msg = bot.send_message(
+                message.chat.id,
+                text=send_del_vip_user_names_text,
+                reply_markup=cencel_btn
+            )
+            bot.register_next_step_handler_by_chat_id(
+                chat_id=message.chat.id,
+                callback=wait_user_name,
+                msg_id=msg.id,
+                tasks=4
+            )
+        
 
     elif message.text:
         # 
