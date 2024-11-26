@@ -3,6 +3,8 @@ from django.db.models import Sum
 from django.db.models.query import QuerySet
 
 # Create your models here.
+# сколько знаков после запятой
+ndigits = 2
 
 class Buyer(models.Model):
     '''
@@ -100,25 +102,25 @@ class Link(models.Model):
         return BaseTable.objects.filter(link=self, join_chat=True).count()
 
     @property
-    def _subs_price(self) -> int:
+    def _subs_price(self) -> float:
         '''
         цена вступивших по данной ссылке
         '''
         if self.ads_price is not None and self._subs > 0:
 
-            return self.ads_price/self._subs
+            return round(self.ads_price/self._subs, ndigits)
 
         return None
     
 
     @property
-    def _write_price(self) -> int:
+    def _write_price(self) -> float:
         '''
         цена тех кто написал по данной ссылке
         '''
         if self.ads_price is not None and self._write > 0:
 
-            return self.ads_price/self._write
+            return round(self.ads_price/self._write, ndigits)
 
         return None
 
@@ -129,7 +131,7 @@ class Link(models.Model):
         '''
         if self.ads_price is not None and self._join_vip > 0:
 
-            return self.ads_price/self._join_vip
+            return round(self.ads_price/self._join_vip, ndigits)
 
         return None
 
@@ -210,6 +212,40 @@ class DaysSummary(models.Model):
         количество подписчиков по ссылкам с этой датой
         '''
         return sum([link._subs for link in self.get_all_links])
+    
+    @property
+    def _PDP_total_price(self) -> float:
+        '''
+        количество подписчиков по ссылкам с этой датой
+        '''
+        _PDP_summa = self._PDP_summa
+        if not _PDP_summa:
+            return 0
+        
+        return round(self._buy_summa/_PDP_summa, ndigits)
+    
+    @property
+    def _write_total_price(self) -> float:
+        '''
+        количество кто написал по ссылкам с этой датой
+        '''
+        _PDP_summa = self._PDP_summa
+        if not _PDP_summa:
+            return 0
+        
+        return round(self._write_summa/_PDP_summa, ndigits)
+
+    @property
+    def _VIP_total_price(self) -> float:
+        '''
+        количество кто написал по ссылкам с этой датой
+        '''
+        _PDP_summa = self._PDP_summa
+        if not _PDP_summa:
+            return 0
+        
+        return round(self._VIP_summa/_PDP_summa, ndigits)
+    
 
     @property
     def _write_summa(self) -> int:
