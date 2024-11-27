@@ -80,6 +80,7 @@ class Link(models.Model):
         
         return f"{self.name} {self.invite_link}"
     
+
     @property
     def _subs(self) -> int:
         '''
@@ -203,7 +204,7 @@ class DaysSummary(models.Model):
         '''
         return self.get_all_links.filter(
             ads_price__isnull=False
-        ).aggregate(Sum("ads_price")).get("ads_price__sum", 0)
+        ).aggregate(Sum("ads_price")).get("ads_price__sum", 0) or 0
     
 
     @property

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.db.models import Sum, Count, F, ExpressionWrapper, DecimalField
+from django.db.models import Count
 
 from django.urls import reverse
 from django.utils.html import format_html
@@ -8,6 +8,7 @@ from django.utils.html import format_html
 # Register your models here.
 
 from bot.models import User, Link, BaseTable, DaysSummary, Buyer
+
 
 
 class DuplicatVideoFilter(admin.SimpleListFilter):
@@ -100,6 +101,18 @@ class LinkAdmin(admin.ModelAdmin):
         #'name',
         ]
     
+
+    def save_model(self, request, obj: Link, form, change):
+        '''
+        перезаписываем метод сохранения модели
+        '''
+
+        admin_link = super().save_model(request, obj, form, change)
+        
+        if obj.date is not None:
+            DaysSummary.objects.get_or_create(date=obj.date)
+
+        return admin_link
     
 
     @admin.display(
@@ -201,12 +214,20 @@ class BaseTableAdmin(admin.ModelAdmin):
 
 class DaysSummaryAdmin(admin.ModelAdmin):
 
-
     
     date_hierarchy = 'date'
     ordering = ['-date']
     readonly_fields = [
         #'date',
+        
+        'buy_summa',
+        'PDP_summa',
+        'PDP_total_price',
+        'write_summa',
+        'write_total_price',
+        'VIP_summa',
+        'VIP_total_price',
+        'PDP_total_summa',
         ]
     exclude = []
     search_fields = [
@@ -227,7 +248,9 @@ class DaysSummaryAdmin(admin.ModelAdmin):
         ]
     
 
-    @admin.display(description='Сума закупа')
+
+    @admin.display(
+            description='Сума закупа',)
     def buy_summa(self, obj: DaysSummary) -> int:
 
         return obj._buy_summa
