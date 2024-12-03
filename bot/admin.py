@@ -7,7 +7,7 @@ from django.utils.html import format_html
 
 # Register your models here.
 
-from bot.models import User, Link, BaseTable, DaysSummary, Buyer
+from bot.models import User, Link, BaseTable, DaysSummary, Buyer, DaysRangeSummary
 
 
 
@@ -292,6 +292,94 @@ class DaysSummaryAdmin(admin.ModelAdmin):
         return obj._VIP_total_price
 
 
+class DaysRangeSummaryAdmin(admin.ModelAdmin):
+
+    list_display_links = [
+        'date_from',
+        'date_to',
+        'buy_summa',
+        'PDP_summa',
+        'PDP_total_price',
+        'write_summa',
+        'write_total_price',
+        'VIP_summa',
+        'VIP_total_price',
+        'PDP_total_summa',
+    ]
+    readonly_fields = [
+        'buy_summa',
+        'PDP_summa',
+        'PDP_total_price',
+        'write_summa',
+        'write_total_price',
+        'VIP_summa',
+        'VIP_total_price',
+        'PDP_total_summa',
+        ]
+    exclude = []
+    search_fields = [
+        ]
+    list_display = [
+        'date_from',
+        'date_to',
+        'buy_summa',
+        'PDP_summa',
+        'PDP_total_price',
+        'write_summa',
+        'write_total_price',
+        'VIP_summa',
+        'VIP_total_price',
+        'PDP_total_summa',
+        ]
+    
+    list_filter = [
+        ]
+    
+
+
+    @admin.display(
+            description='Сума закупа',)
+    def buy_summa(self, obj: DaysSummary) -> int:
+
+        return obj._buy_summa
+    
+    @admin.display(description='ПДП')
+    def PDP_summa(self, obj: DaysSummary) -> int:
+
+        return obj._PDP_summa
+    
+    @admin.display(description='Написало')
+    def write_summa(self, obj: DaysSummary) -> int:
+
+        return obj._write_summa
+    
+    @admin.display(description='VIP')
+    def VIP_summa(self, obj: DaysSummary) -> int:
+
+        return obj._VIP_summa
+    
+    @admin.display(description='ПДП база')
+    def PDP_total_summa(self, obj: DaysSummary) -> int:
+
+        return obj._PDP_total_summa
+    
+
+    @admin.display(description='Стоимость')
+    def PDP_total_price(self, obj: DaysSummary) -> int:
+
+        return obj._PDP_total_price
+    
+    @admin.display(description='Стоимость')
+    def write_total_price(self, obj: DaysSummary) -> int:
+
+        return obj._write_total_price
+    
+    @admin.display(description='Стоимость')
+    def VIP_total_price(self, obj: DaysSummary) -> int:
+
+        return obj._VIP_total_price
+
+
 class BuyerAdmin(admin.ModelAdmin):
     
     readonly_fields = [
@@ -315,3 +403,4 @@ admin.site.register(DaysSummary, DaysSummaryAdmin)
 admin.site.register(Link, LinkAdmin)
 admin.site.register(User, UserAdmin)
 admin.site.register(BaseTable, BaseTableAdmin)
+admin.site.register(DaysRangeSummary, DaysRangeSummaryAdmin)

@@ -272,3 +272,117 @@ class DaysSummary(models.Model):
             date__date=self.date
         ).count()
     
+
+
+class DaysRangeSummary(models.Model):
+    '''
+    статистика по периодам
+    '''
+    class Meta:
+        abstract = False
+        verbose_name = "Период"
+        verbose_name_plural = "Период"
+        
+        unique_together = ('date_from', 'date_to')
+    
+
+    date_from = models.DateField("Дата от", null=True, default=None, blank=True)
+    date_to = models.DateField("Дата до", null=True, default=None, blank=True)
+
+
+    def __str__(self):
+        
+        return f"{self.date_from or '-'} {self.date_to or '-'}"
+
+    @property
+    def get_all_links(self) -> QuerySet[Link]:
+        '''
+        все ссылки за указаный период дат
+        '''
+        qweryset = Link.objects.all()
+        if self.date_from is not None:
+            qweryset = qweryset.filter(date__gte=self.date_from)
+        if self.date_to is not None:
+            qweryset = qweryset.filter(date__lte=self.date_to)
+        return qweryset
+
+
+    @property
+    def _buy_summa(self) -> int:
+        '''
+        сумма закупов ссылок по дате
+        '''
+        return self.get_all_links.filter(
+            ads_price__isnull=False
+        ).aggregate(Sum("ads_price")).get("ads_price__sum", 0) or 0
+    
+
+    @property
+    def _PDP_summa(self) -> int:
+        '''
+        количество подписчиков по ссылкам с этой датой
+        '''
+        return sum([link._subs for link in self.get_all_links])
+    
+    @property
+    def _PDP_total_price(self) -> float:
+        '''
+        количество подписчиков по ссылкам с этой датой
+        '''
+        _PDP_summa = self._PDP_summa
+        if not _PDP_summa:
+            return 0
+        
+        return round(self._buy_summa/_PDP_summa, ndigits)
+    
+    @property
+    def _write_total_price(self) -> float:
+        '''
+        количество кто написал по ссылкам с этой датой
+        '''
+        _PDP_summa = self._PDP_summa
+        if not _PDP_summa:
+            return 0
+        
+        return round(self._write_summa/_PDP_summa, ndigits)
+
+    @property
+    def _VIP_total_price(self) -> float:
+        '''
+        количество кто написал по ссылкам с этой датой
+        '''
+        _PDP_summa = self._PDP_summa
+        if not _PDP_summa:
+            return 0
+        
+        return round(self._VIP_summa/_PDP_summa, ndigits)
+    
+
+    @property
+    def _write_summa(self) -> int:
+        '''
+        количество кто написал по ссылкам с этой датой
+        '''
+        return sum([link._write for link in self.get_all_links])
+    
+    @property
+    def _VIP_summa(self) -> int:
+        '''
+        количество кто вступил в вип по ссылкам с этой датой
+        '''
+        return sum([link._join_vip for link in self.get_all_links])
+
+
+    @property
+    def _PDP_total_summa(self) -> int:
+        '''
+        количество подписчиков за этот день
+        '''
+        qweryset = BaseTable.objects.all()
+        if self.date_from is not None:
+            qweryset = qweryset.filter(date__date__gte=self.date_from)
+        if self.date_to is not None:
+            qweryset = qweryset.filter(date__date__lte=self.date_to)
+        return qweryset.count()
+
+    
