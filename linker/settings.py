@@ -27,8 +27,10 @@ CHANNEL_ID = int(os.getenv("CHANNEL_ID"))
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG") == "True"
-TABLE_URL = "http://127.0.0.1:8000/admin"
-ALLOWED_HOSTS = []
+TABLE_URL = "http://159.89.19.5:5007/admin"
+ALLOWED_HOSTS = [
+    "159.89.19.5",
+]
 
 
 # Application definition
