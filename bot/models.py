@@ -146,7 +146,7 @@ class BaseTable(models.Model):
         verbose_name = "База"
         verbose_name_plural = "База"
     
-    date = models.DateTimeField("Дата Вступления", auto_now=True)
+    date = models.DateTimeField("Дата Вступления", auto_now_add=True)
     user = models.ForeignKey(verbose_name="Юзер", to=User, on_delete=models.CASCADE)
     link = models.ForeignKey(verbose_name="Ссылка", to=Link, on_delete=models.CASCADE)
     write = models.BooleanField("Написал", default=False)
