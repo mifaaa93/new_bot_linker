@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.db.models import Count
+from django.db.models import Count, Q
 
 from django.urls import reverse
 from django.utils.html import format_html
@@ -44,10 +44,20 @@ class UserAdmin(admin.ModelAdmin):
         ]
     search_fields = [
         'user_id',
-        'user_name',
-        "first_name",
         ]
     
+    
+    def get_search_results(self, request, queryset, search_term):
+        # Преобразуем поисковый запрос в нижний регистр
+        if search_term:
+            search_term = search_term.lower()
+            # Используем Q-объекты для регистронезависимого поиска
+            queryset = queryset.filter(
+                Q(user_id__contains=search_term) |
+                Q(user_name__iregex=search_term) |
+                Q(first_name__iregex=search_term))
+        return queryset, False
+
     exclude = []
 
     list_display = [
@@ -74,8 +84,17 @@ class LinkAdmin(admin.ModelAdmin):
     exclude = []
     search_fields = [
         'name',
-        'invite_link',
         ]
+    
+    def get_search_results(self, request, queryset, search_term):
+        # Преобразуем поисковый запрос в нижний регистр
+        if search_term:
+            search_term = search_term.lower()
+            # Используем Q-объекты для регистронезависимого поиска
+            queryset = queryset.filter(Q(name__iregex=search_term) | Q(invite_link__iregex=search_term))
+        return queryset, False
+
+
     list_editable=[
         "ads_price",
         "date",
@@ -173,11 +192,20 @@ class BaseTableAdmin(admin.ModelAdmin):
     
     search_fields = [
         'link__name',
-        'link__invite_link',
-        'user__user_id',
-        'user__user_name',
         ]
     
+    def get_search_results(self, request, queryset, search_term):
+        # Преобразуем поисковый запрос в нижний регистр
+        if search_term:
+            search_term = search_term.lower()
+            # Используем Q-объекты для регистронезависимого поиска
+            queryset = queryset.filter(
+                Q(user__user_id__contains=search_term) |
+                Q(user__user_name__iregex=search_term) |
+                Q(link__name__iregex=search_term) |
+                Q(link__invite_link__iregex=search_term))
+        return queryset, False
+
     exclude = []
     list_display_links = ["id", "date",]
     list_editable=[
@@ -422,6 +450,15 @@ class BuyerAdmin(admin.ModelAdmin):
         'name',
         ]
     
+    def get_search_results(self, request, queryset, search_term):
+        # Преобразуем поисковый запрос в нижний регистр
+        if search_term:
+            search_term = search_term.lower()
+            # Используем Q-объекты для регистронезависимого поиска
+            queryset = queryset.filter(
+                Q(name__iregex=search_term))
+        return queryset, False
+
     list_filter = [
         ]
 
@@ -445,8 +482,15 @@ class LinkFilterAdmin(ExtraButtonsMixin, admin.ModelAdmin):
     exclude = []
     search_fields = [
         'invite_link__name',
-        'invite_link__invite_link',
         ]
+
+    def get_search_results(self, request, queryset, search_term):
+        # Преобразуем поисковый запрос в нижний регистр
+        if search_term:
+            search_term = search_term.lower()
+            # Используем Q-объекты для регистронезависимого поиска
+            queryset = queryset.filter(Q(invite_link__name__iregex=search_term) | Q(invite_link__invite_link__iregex=search_term))
+        return queryset, False
 
     
     list_display = [
