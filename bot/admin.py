@@ -426,9 +426,9 @@ class BuyerAdmin(admin.ModelAdmin):
         ]
 
 
-
 class LinkFilterAdmin(ExtraButtonsMixin, admin.ModelAdmin):
     
+    date_hierarchy = 'date'
 
     readonly_fields = [
         'subs',
