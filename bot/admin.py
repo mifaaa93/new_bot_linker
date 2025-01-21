@@ -234,6 +234,7 @@ class DaysSummaryAdmin(admin.ModelAdmin):
         ]
     list_display = [
         'date',
+        "buyers_admin",
         'buy_summa',
         'PDP_summa',
         'PDP_total_price',
@@ -247,6 +248,19 @@ class DaysSummaryAdmin(admin.ModelAdmin):
     list_filter = [
         ]
     
+
+    @admin.display(
+            description='Закупщики',)
+    def buyers_admin(self, obj: DaysSummary) -> int:
+
+        if obj.buyers.exists():
+            s = '<ol>'
+            for b in obj.buyers.all():
+                link = reverse("admin:bot_buyer_change", args=[b.id])
+                s += "<li><a href='%s'>%s</a></li>" % (link, str(b.name))
+            s += "</ol>"
+            return format_html(s)
+        return "Все"
 
 
     @admin.display(
@@ -322,6 +336,7 @@ class DaysRangeSummaryAdmin(admin.ModelAdmin):
     list_display = [
         'date_from',
         'date_to',
+        'buyers_admin',
         'buy_summa',
         'PDP_summa',
         'PDP_total_price',
@@ -335,6 +350,19 @@ class DaysRangeSummaryAdmin(admin.ModelAdmin):
     list_filter = [
         ]
     
+
+    @admin.display(
+            description='Закупщики',)
+    def buyers_admin(self, obj: DaysSummary) -> int:
+
+        if obj.buyers.exists():
+            s = '<ol>'
+            for b in obj.buyers.all():
+                link = reverse("admin:bot_buyer_change", args=[b.id])
+                s += "<li><a href='%s'>%s</a></li>" % (link, str(b.name))
+            s += "</ol>"
+            return format_html(s)
+        return "Все"
 
 
     @admin.display(

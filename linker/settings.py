@@ -30,6 +30,7 @@ DEBUG = os.getenv("DEBUG") == "True"
 TABLE_URL = "http://159.89.19.5:5007/admin"
 ALLOWED_HOSTS = [
     "159.89.19.5",
+    "127.0.0.1",
 ]
 
 

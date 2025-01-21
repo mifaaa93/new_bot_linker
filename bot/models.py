@@ -184,7 +184,8 @@ class DaysSummary(models.Model):
         verbose_name_plural = "Дни"
     
 
-    date = models.DateField("Дата", unique=True)
+    date = models.DateField("Дата", blank=False, null=False)
+    buyers = models.ManyToManyField(to=Buyer, verbose_name="Закупщики", blank=True)
 
 
     @property
@@ -192,6 +193,11 @@ class DaysSummary(models.Model):
         '''
         все ссылки за указаную дату
         '''
+        if self.buyers.exists():
+            return Link.objects.filter(
+            date=self.date,
+            buyer__in=self.buyers.all()
+        )
         return Link.objects.filter(
             date=self.date
         )
@@ -282,12 +288,11 @@ class DaysRangeSummary(models.Model):
         abstract = False
         verbose_name = "Период"
         verbose_name_plural = "Период"
-        
-        unique_together = ('date_from', 'date_to')
     
 
     date_from = models.DateField("Дата от", null=True, default=None, blank=True)
     date_to = models.DateField("Дата до", null=True, default=None, blank=True)
+    buyers = models.ManyToManyField(to=Buyer, verbose_name="Закупщики", blank=True)
 
 
     def __str__(self):
@@ -300,6 +305,8 @@ class DaysRangeSummary(models.Model):
         все ссылки за указаный период дат
         '''
         qweryset = Link.objects.all()
+        if self.buyers.exists():
+            qweryset = qweryset.filter(buyer__in=self.buyers.all())
         if self.date_from is not None:
             qweryset = qweryset.filter(date__gte=self.date_from)
         if self.date_to is not None:
