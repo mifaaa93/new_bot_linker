@@ -393,3 +393,58 @@ class DaysRangeSummary(models.Model):
         return qweryset.count()
 
     
+
+
+class LinkFilter(models.Model):
+    '''
+    ссылки для вступления в канал
+    '''
+    class Meta:
+        abstract = False
+        verbose_name = "Ссылка (сорт)"
+        verbose_name_plural = "Ссылки (сорт)"
+    
+    invite_link = models.ForeignKey(to=Link, on_delete=models.CASCADE, verbose_name="Ссылка", null=False)
+
+    ads_price = models.IntegerField("Цена Рекламы", default=None, null=True, blank=True, editable=False)
+    date = models.DateField("Дата", default=None, null=True, blank=True)
+
+    buyer = models.ForeignKey(
+        verbose_name="Закупщик",
+        to=Buyer,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        default=None,
+        editable=False)
+
+
+    subs = models.IntegerField("Подписалось", default=None, null=True, blank=True, editable=False)
+    write = models.IntegerField("Написало", default=None, null=True, blank=True, editable=False)
+    join_vip = models.IntegerField("Вступило в VIP", default=None, null=True, blank=True, editable=False)
+    subs_price = models.FloatField("Цена ПДП", default=None, null=True, blank=True, editable=False)
+    write_price = models.FloatField("Цена Написало", default=None, null=True, blank=True, editable=False)
+    join_vip_price = models.FloatField("Цена Вступило в VIP", default=None, null=True, blank=True, editable=False)
+
+
+    def refresh(self) -> None:
+        '''
+        '''
+        invite_link: Link = self.invite_link
+        self.ads_price = invite_link.ads_price
+        self.date = invite_link.date
+        self.buyer = invite_link.buyer
+        self.subs = invite_link._subs
+        self.write = invite_link._write
+        self.join_vip = invite_link._join_vip
+        self.subs_price = invite_link._subs_price
+        self.write_price = invite_link._write_price
+        self.join_vip_price = invite_link._join_vip_price
+
+        self.save()
+
+
+    def __str__(self):
+
+
+        return f"{self.invite_link}"

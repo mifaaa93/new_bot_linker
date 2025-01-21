@@ -4,10 +4,11 @@ from django.db.models import Count
 from django.urls import reverse
 from django.utils.html import format_html
 
-
+from admin_extra_buttons.api import ExtraButtonsMixin, button
+from admin_extra_buttons.utils import HttpResponseRedirectToReferrer
 # Register your models here.
 
-from bot.models import User, Link, BaseTable, DaysSummary, Buyer, DaysRangeSummary
+from bot.models import User, Link, BaseTable, DaysSummary, Buyer, DaysRangeSummary, LinkFilter
 
 
 
@@ -426,9 +427,66 @@ class BuyerAdmin(admin.ModelAdmin):
 
 
 
+class LinkFilterAdmin(ExtraButtonsMixin, admin.ModelAdmin):
+    
+
+    readonly_fields = [
+        'subs',
+        "write",
+        "join_vip",
+        'ads_price',
+        "subs_price",
+        "write_price",
+        "join_vip_price",
+        'date',
+        'buyer',
+        ]
+
+    exclude = []
+    search_fields = [
+        'invite_link__name',
+        'invite_link__invite_link',
+        ]
+
+    
+    list_display = [
+        'invite_link',
+        'subs',
+        "write",
+        "join_vip",
+        'ads_price',
+        "subs_price",
+        "write_price",
+        "join_vip_price",
+        'date',
+        'buyer',
+        ]
+    
+    list_filter = [
+        'buyer',
+        "date",
+        #'name',
+        ]
+    @button(html_attrs={'style': 'background-color:#88FF88;color:black'})
+    def refresh_data(self, request):
+
+        try:
+            for link in Link.objects.all():
+                link_filter, is_new = LinkFilter.objects.get_or_create(invite_link=link)
+                link_filter.refresh()
+            self.message_user(request, 'Данные обновлены', level="SUCCESS")
+        except Exception as e:
+            self.message_user(request, f'Данные не обновлены: {repr(e)}', level="ERROR")
+
+        return HttpResponseRedirectToReferrer(request)
+    
+
+
+
 admin.site.register(Buyer, BuyerAdmin)
 admin.site.register(DaysSummary, DaysSummaryAdmin)
 admin.site.register(Link, LinkAdmin)
+admin.site.register(LinkFilter, LinkFilterAdmin)
 admin.site.register(User, UserAdmin)
 admin.site.register(BaseTable, BaseTableAdmin)
 admin.site.register(DaysRangeSummary, DaysRangeSummaryAdmin)

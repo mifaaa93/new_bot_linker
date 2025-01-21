@@ -1,3 +1,4 @@
 Django
 pyTelegramBotAPI
 python-dotenv
+django-admin-extra-buttons
