@@ -7,7 +7,7 @@ from django.utils.html import format_html
 from admin_extra_buttons.api import ExtraButtonsMixin, button
 from admin_extra_buttons.utils import HttpResponseRedirectToReferrer
 # Register your models here.
-
+from re import escape
 from bot.models import User, Link, BaseTable, DaysSummary, Buyer, DaysRangeSummary, LinkFilter
 
 
@@ -50,7 +50,7 @@ class UserAdmin(admin.ModelAdmin):
     def get_search_results(self, request, queryset, search_term):
         # Преобразуем поисковый запрос в нижний регистр
         if search_term:
-            search_term = search_term.lower()
+            search_term = escape(search_term.lower())
             # Используем Q-объекты для регистронезависимого поиска
             queryset = queryset.filter(
                 Q(user_id__contains=search_term) |
@@ -89,9 +89,9 @@ class LinkAdmin(admin.ModelAdmin):
     def get_search_results(self, request, queryset, search_term):
         # Преобразуем поисковый запрос в нижний регистр
         if search_term:
-            search_term = search_term.lower()
+            search_term = escape(search_term.lower())
             # Используем Q-объекты для регистронезависимого поиска
-            queryset = queryset.filter(Q(name__iregex=search_term) | Q(invite_link__iregex=search_term))
+            queryset = queryset.filter(Q(name__iregex=search_term))
         return queryset, False
 
 
@@ -197,7 +197,7 @@ class BaseTableAdmin(admin.ModelAdmin):
     def get_search_results(self, request, queryset, search_term):
         # Преобразуем поисковый запрос в нижний регистр
         if search_term:
-            search_term = search_term.lower()
+            search_term = escape(search_term.lower())
             # Используем Q-объекты для регистронезависимого поиска
             queryset = queryset.filter(
                 Q(user__user_id__contains=search_term) |
@@ -454,7 +454,7 @@ class BuyerAdmin(admin.ModelAdmin):
     def get_search_results(self, request, queryset, search_term):
         # Преобразуем поисковый запрос в нижний регистр
         if search_term:
-            search_term = search_term.lower()
+            search_term = escape(search_term.lower())
             # Используем Q-объекты для регистронезависимого поиска
             queryset = queryset.filter(
                 Q(name__iregex=search_term))
@@ -489,9 +489,9 @@ class LinkFilterAdmin(ExtraButtonsMixin, admin.ModelAdmin):
     def get_search_results(self, request, queryset, search_term):
         # Преобразуем поисковый запрос в нижний регистр
         if search_term:
-            search_term = search_term.lower()
+            search_term = escape(search_term.lower())
             # Используем Q-объекты для регистронезависимого поиска
-            queryset = queryset.filter(Q(invite_link__name__iregex=search_term) | Q(invite_link__invite_link__iregex=search_term))
+            queryset = queryset.filter(Q(invite_link__name__iregex=search_term))
         return queryset, False
 
     
