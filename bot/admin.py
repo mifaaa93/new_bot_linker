@@ -284,9 +284,10 @@ class DaysSummaryAdmin(admin.ModelAdmin):
 
         if obj.buyers.exists():
             s = '<ol>'
-            for b in obj.buyers.all():
-                link = reverse("admin:bot_buyer_change", args=[b.id])
-                s += "<li><a href='%s'>%s</a></li>" % (link, str(b.name))
+            for buyer in obj.buyers.all():
+                buyer: Buyer
+                link = reverse("admin:bot_buyer_change", args=[buyer.id])
+                s += "<li><a href='%s'>%s</a></li>" % (link, str(buyer.name))
             s += "</ol>"
             return format_html(s)
         return "Все"
@@ -468,6 +469,7 @@ class LinkFilterAdmin(ExtraButtonsMixin, admin.ModelAdmin):
     date_hierarchy = 'date'
 
     readonly_fields = [
+        'invite_link',
         'subs',
         "write",
         "join_vip",
@@ -494,7 +496,7 @@ class LinkFilterAdmin(ExtraButtonsMixin, admin.ModelAdmin):
 
     
     list_display = [
-        'invite_link',
+        'invite_link_name',
         'subs',
         "write",
         "join_vip",
@@ -504,6 +506,7 @@ class LinkFilterAdmin(ExtraButtonsMixin, admin.ModelAdmin):
         "join_vip_price",
         'date',
         'buyer',
+        "invite_link_link",
         ]
     
     list_filter = [
@@ -511,6 +514,23 @@ class LinkFilterAdmin(ExtraButtonsMixin, admin.ModelAdmin):
         "date",
         #'name',
         ]
+    
+
+    @admin.display(
+            description='Название ссылки',
+            ordering="invite_link__name")
+    def invite_link_name(self, obj: LinkFilter) -> str:
+
+        return obj.invite_link.name
+    
+    @admin.display(
+            description='Cсылки',
+            ordering="invite_link__invite_link")
+    def invite_link_link(self, obj: LinkFilter) -> str:
+
+        return obj.invite_link.invite_link
+
+
     @button(html_attrs={'style': 'background-color:#88FF88;color:black'})
     def refresh_data(self, request):
 
