@@ -81,7 +81,7 @@ def turn_on_write(user: User) -> None:
     '''
     отмечаем что юзер написал на последней строке
     '''
-    if BaseTable.objects.filter(user=user, write=True).first() is None:
+    if not BaseTable.objects.filter(user=user, write=True).exists():
         last_row = BaseTable.objects.filter(user=user).last()
         if last_row is not None:
             last_row.make_write(True)
@@ -98,10 +98,13 @@ def turn_off_write(user: User) -> None:
 
 def turn_on_join_VIP(user: User) -> None:
     '''
+    проверка если вступил в вип еще нету то отмечаем на последней дате
     '''
-    rows = BaseTable.objects.filter(user=user)
-    for row in rows:
-        row.make_join_VIP(True)
+    if not BaseTable.objects.filter(user=user, join_chat=True).exists():
+        last_row = BaseTable.objects.filter(user=user).last()
+        if last_row is not None:
+            last_row.make_join_VIP(True)
+
 
 def turn_off_join_VIP(user: User) -> None:
     '''
