@@ -165,7 +165,7 @@ def main_menu(message: Message) -> None:
 
     bot.send_message(
         message.chat.id,
-        text=send_write_user_names_text,
+        text=main_admin_menu,
         reply_markup=admin_menu_keyboard)
 
 
@@ -292,15 +292,23 @@ def admin_btn(message: Message) -> None:
                 msg_id=msg.id,
                 tasks=9
             )
-        
+        elif message.text == write_user_btn_text:
+            # вводим юзернейм или юзерайди
+            msg = bot.send_message(
+                message.chat.id,
+                text=send_write_user_names_text,
+                reply_markup=cencel_btn
+            )
+            bot.register_next_step_handler_by_chat_id(
+                chat_id=message.chat.id,
+                callback=wait_user_name,
+                msg_id=msg.id,
+                tasks=1
+            )
 
     elif message.text:
         # 
-        t = Thread(
-            target=update_users,
-            args=(message, 1)
-        )
-        t.start()
+        main_menu(message)
 
 
 @bot.callback_query_handler(func=is_admin)
