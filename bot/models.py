@@ -49,6 +49,24 @@ class User(models.Model):
         return f"{s} {self.user_id}"
 
 
+    @property
+    def username_or_empty(self) -> str:
+        '''
+        '''
+        if self.user_name is not None:
+            return f"@{self.user_name}"
+        return ''
+    
+    
+    @property
+    def names(self) -> str:
+        '''
+        '''
+        if self.last_name is not None:
+            return f"{self.first_name} {self.last_name}"
+        return f"{self.first_name}"
+
+
 class Link(models.Model):
     '''
     ссылки для вступления в канал
@@ -151,6 +169,37 @@ class BaseTable(models.Model):
     link = models.ForeignKey(verbose_name="Ссылка", to=Link, on_delete=models.CASCADE)
     write = models.BooleanField("Написал", default=False)
     join_chat = models.BooleanField("Вступил в VIP", default=False)
+
+
+    @property
+    def to_text_links(self) -> str:
+        '''
+        31/02/2033 | 1150564331 - ТЕСТ Сергеевич111
+        '''
+        return f"{self.date_str} {self.user.user_id} {self.link.name}"
+    
+    
+    @property
+    def to_text_names(self) -> str:
+        '''
+        31/02/2033 | 1150564331 - ТЕСТ Сергеевич111
+        '''
+        return f"{self.date_str} {self.user.user_id} {self.user.names}"
+    
+    @property
+    def to_text_usernames(self) -> str:
+        '''
+        31/02/2033 | 1150564331 - ТЕСТ Сергеевич111
+        '''
+        return f"{self.date_str} {self.user.user_id} {self.user.username_or_empty}"
+
+
+    @property
+    def date_str(self) -> str:
+        '''
+        25/02/2033
+        '''
+        return self.date.strftime("%d/%m/%Y")
 
 
     def make_write(self, val: bool=True) -> None:

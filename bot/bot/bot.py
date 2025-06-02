@@ -76,7 +76,15 @@ def wait_user_name(message: Message, msg_id: int, tasks: int=2) -> None:
 
 def update_users(message: Message, task: int) -> None:
     '''
+    tasks 7 тг id - юзернейм
+    tasks 8 тг id - имя фамилия 
+    tasks 9 тг id - название ссылки с которой он подписался на канал - и дату подписки. 
     '''
+    list_users = []
+    for u in message.text.split("\n"):
+        u_str = u.strip()
+        if u_str and u_str not in list_users:
+            list_users.append(u_str)
     users = set([user.strip() for user in message.text.split("\n") if user.strip()])
     if task <= 4:
         counter = confirm(task, users)
@@ -93,6 +101,33 @@ def update_users(message: Message, task: int) -> None:
     elif task == 6:
         # проверка юзеров по статсусам
         resp = status_users(users)
+        for text in smart_split(resp):
+            antiflood(
+                function=bot.reply_to,
+                message=message,
+                text=text)
+    
+    elif task == 7:
+        # тг id - юзернейм
+        resp = username_users(list_users)
+        for text in smart_split(resp):
+            antiflood(
+                function=bot.reply_to,
+                message=message,
+                text=text)
+    
+    elif task == 8:
+        # тг id - имя фамилия
+        resp = names_users(list_users)
+        for text in smart_split(resp):
+            antiflood(
+                function=bot.reply_to,
+                message=message,
+                text=text)
+    
+    elif task == 9:
+        # тг id - название ссылки с которой он подписался на канал - и дату подписки.
+        resp = links_users(list_users)
         for text in smart_split(resp):
             antiflood(
                 function=bot.reply_to,
@@ -216,6 +251,46 @@ def admin_btn(message: Message) -> None:
                 callback=wait_user_name,
                 msg_id=msg.id,
                 tasks=6
+            )
+        
+        elif message.text == btn1_text:
+            # вводим юзернейм или юзерайди
+            msg = bot.send_message(
+                message.chat.id,
+                text=check_1_text,
+                reply_markup=cencel_btn
+            )
+            bot.register_next_step_handler_by_chat_id(
+                chat_id=message.chat.id,
+                callback=wait_user_name,
+                msg_id=msg.id,
+                tasks=7
+            )
+        elif message.text == btn2_text:
+            # вводим юзернейм или юзерайди
+            msg = bot.send_message(
+                message.chat.id,
+                text=check_2_text,
+                reply_markup=cencel_btn
+            )
+            bot.register_next_step_handler_by_chat_id(
+                chat_id=message.chat.id,
+                callback=wait_user_name,
+                msg_id=msg.id,
+                tasks=8
+            )
+        elif message.text == btn3_text:
+            # вводим юзернейм или юзерайди
+            msg = bot.send_message(
+                message.chat.id,
+                text=check_3_text,
+                reply_markup=cencel_btn
+            )
+            bot.register_next_step_handler_by_chat_id(
+                chat_id=message.chat.id,
+                callback=wait_user_name,
+                msg_id=msg.id,
+                tasks=9
             )
         
 

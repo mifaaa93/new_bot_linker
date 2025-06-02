@@ -171,3 +171,127 @@ def status_users(users: set[str]) -> str:
                     v = "✅"
             res += f"{user_name_or_id} - {w} {v}\n"
     return res
+
+
+
+def username_users(users: set[str]) -> str:
+    base_counter = 0
+    no_base_counter = 0
+    double_counter = 0
+    all_unique_counter = 0
+    base_text = ''
+    no_base_text = ''
+    double_text = ''
+    for user_name_or_id in users:
+        user = get_user_by_username_or_id(user_name_or_id)
+        if user is None:
+            no_base_text += f"{user_name_or_id} - ❌\n"
+            no_base_counter += 1
+        else:
+            base_counter += 1
+            bases = BaseTable.objects.filter(user=user).order_by('-date')
+            is_double = bases.count() > 1
+            if is_double:
+                double_counter += 1
+            for i, b in enumerate(bases):
+                all_unique_counter += 1
+                if i == 0:
+                    base_text += f"{b.to_text_usernames}\n"
+                if is_double:
+                    double_text += f"{b.to_text_usernames}\n"
+
+
+    res = base_text + "\n"
+    res += no_base_text + "\n"
+    res += double_text + "\n"
+    res += f"<b>Всего: У-{all_unique_counter}  Б-{base_counter} Д-{double_counter} Н-{no_base_counter}</b>"
+
+    
+    return res
+
+def names_users(users: set[str]) -> str:
+    base_counter = 0
+    no_base_counter = 0
+    double_counter = 0
+    all_unique_counter = 0
+    base_text = ''
+    no_base_text = ''
+    double_text = ''
+    for user_name_or_id in users:
+        user = get_user_by_username_or_id(user_name_or_id)
+        if user is None:
+            no_base_text += f"{user_name_or_id} - ❌\n"
+            no_base_counter += 1
+        else:
+            base_counter += 1
+            bases = BaseTable.objects.filter(user=user).order_by('-date')
+            is_double = bases.count() > 1
+            if is_double:
+                double_counter += 1
+            for i, b in enumerate(bases):
+                all_unique_counter += 1
+                if i == 0:
+                    base_text += f"{b.to_text_names}\n"
+                if is_double:
+                    double_text += f"{b.to_text_names}\n"
+
+
+    res = base_text + "\n"
+    res += no_base_text + "\n"
+    res += double_text + "\n"
+    res += f"<b>Всего: У-{all_unique_counter}  Б-{base_counter} Д-{double_counter} Н-{no_base_counter}</b>"
+
+    
+    return res
+
+def links_users(users: set[str]) -> str:
+    '''
+    22/12/25 6150900683 Закуп 23 (выдавать дату последнего попадания в базу)
+    22/12/25 1036256165 Закуп 23
+    22/12/25 5975061736 Закуп 7 
+    22/12/25 1150564331 (нет названия ссылки просто пустое)  
+    22/12/25 1767256906 Закуп 124
+    22/12/25 5761561503 (нет названия ссылки просто пустое) 
+
+    1434423803 - ❌ (нет в базе)
+
+    (ниже идут дубли, которые находятся по базе, называть не нужно, просто с новой строки, после тех кого нет в базе) 
+    22/12/25 6150900683 Закуп 23
+    10/10/22 6150900683 Закуп 23
+    03/07/25 6150900683 Закуп 23
+
+    <b>Всего: У-7 (уникальные)  Б-6 (по базе уникальные) Д-1 (дубли) Н-1 (нет в базе)
+    '''
+    base_counter = 0
+    no_base_counter = 0
+    double_counter = 0
+    all_unique_counter = 0
+    base_text = ''
+    no_base_text = ''
+    double_text = ''
+    for user_name_or_id in users:
+        user = get_user_by_username_or_id(user_name_or_id)
+        if user is None:
+            no_base_text += f"{user_name_or_id} - ❌\n"
+            no_base_counter += 1
+        else:
+            base_counter += 1
+            bases = BaseTable.objects.filter(user=user).order_by('-date')
+            is_double = bases.count() > 1
+            if is_double:
+                double_counter += 1
+            for i, b in enumerate(bases):
+                all_unique_counter += 1
+                if i == 0:
+                    base_text += f"{b.to_text_links}\n"
+                if is_double:
+                    double_text += f"{b.to_text_links}\n"
+
+
+    res = base_text + "\n"
+    res += no_base_text + "\n"
+    res += double_text + "\n"
+    res += f"<b>Всего: У-{all_unique_counter}  Б-{base_counter} Д-{double_counter} Н-{no_base_counter}</b>"
+
+    
+    return res
