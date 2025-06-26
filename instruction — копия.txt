@@ -1,0 +1,95 @@
+сначала прописываем BOT_TOKEN, CHANNEL_ID и ADMINS в файле .env
+затем в файле linker/settings.py на строках 30 и 32 прописываем айпи вашего сервера, на котором будет запускаться новый бот
+TABLE_URL = "http://159.89.19.5:5007/admin"  #тут новый айпи
+ALLOWED_HOSTS = [
+    "159.89.19.5", #тут новый айпи
+    "127.0.0.1",
+]
+закидываем папку с ботом на сервер (папку не переименовывать)
+
+дальше по ssh подключаемся к серверу и работаем в консоли
+
+sudo apt install -y python3-venv 
+sudo apt install -y build-essential libssl-dev libffi-dev python3-dev
+
+# перехожим в директрию бота и делаем дальнейшие настройки
+cd new_bot_linker
+
+# создаем виртуальное окружение
+python3 -m venv venv
+
+# активируем окружение
+source venv/bin/activate
+
+# и устанавливаем необходимые библиотеки внутри окружения
+pip install -r requirements.txt
+
+# создаем базу данных
+python manage.py makemigrations
+python manage.py migrate
+
+# создаем юзера для доступа в админку
+python manage.py createsuperuser
+
+настройка готова. 
+
+создаем сервисы для автозапуска бота и админки
+
+сервис для бота (выполнить команду sudo nano /etc/systemd/system/linker_bot.service и вставить туда то что ниже между линиями)
+сохранить и закрыть
+
+sudo nano /etc/systemd/system/linker_bot.service
+____________________________
+[Unit]
+Description=bot linker
+After=multi-user.target
+
+[Service]
+Type=idle
+WorkingDirectory=/root/new_bot_linker
+ExecStart=/root/new_bot_linker/venv/bin/python3 /root/new_bot_linker/manage.py runbot
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+
+____________________________
+
+тоже самое и для сервиса админки
+
+sudo nano /etc/systemd/system/linker_admin.service
+____________________________
+[Unit]
+Description=admin linker
+After=multi-user.target
+
+[Service]
+Type=idle
+WorkingDirectory=/root/new_bot_linker
+ExecStart=/root/new_bot_linker/venv/bin/python3 /root/new_bot_linker/manage.py runserver 0.0.0.0:5007
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+____________________________
+
+
+дальше выполнить пять первых команд.
+ну и посмотреть статусы (8 и 9 команды)
+если все ок то на этом настройка и запуск завершены
+sudo systemctl daemon-reload
+
+sudo systemctl enable linker_bot
+sudo systemctl enable linker_admin
+
+sudo systemctl start linker_bot
+sudo systemctl start linker_admin
+
+sudo systemctl stop linker_bot
+sudo systemctl stop linker_admin
+
+sudo systemctl status linker_bot
+sudo systemctl status linker_admin
+
+sudo systemctl restart linker_bot
+sudo systemctl restart linker_admin
