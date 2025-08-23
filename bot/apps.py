@@ -4,6 +4,7 @@ from django.apps import AppConfig
 class BotConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'bot'
+    verbose_name = "Бот"
     
     def ready(self):
         from bot import signals  # noqa

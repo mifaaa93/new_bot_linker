@@ -1,3 +1,4 @@
+# bot\admin.py
 from django.contrib import admin
 from django.db.models import Count, Q
 
@@ -576,3 +577,53 @@ admin.site.register(User, UserAdmin)
 admin.site.register(BaseTable, BaseTableAdmin)
 admin.site.register(DaysRangeSummary, DaysRangeSummaryAdmin)
 admin.site.register(Admin, AdminAdmin)
+
+# === САЙДБАР: минимальная переупорядочка приложений и моделей ===
+from types import MethodType
+
+# 1) Порядок приложений (имена как в сайдбаре / AppConfig.verbose_name)
+APPS_ORDER = [
+    "Бот",
+    "Пользователи и группы",
+]
+
+# 2) Порядок моделей внутри приложения "Бот" по имени КЛАССА (object_name)
+MODELS_ORDER = {
+    "Бот": [
+        "BaseTable",
+        "DaysSummary",
+        "DaysRangeSummary",
+        "Buyer",
+        "Link",
+        "LinkFilter",
+        "User",
+        "Admin",
+    ],
+}
+
+# Сохраняем оригинальный bound-метод ДО замены
+_original_get_app_list = admin.site.get_app_list
+
+def _get_app_list_ordered(self, request):
+    # Вызываем оригинал (он уже привязан к admin.site)
+    app_list = _original_get_app_list(request)
+
+    # Сортировка приложений
+    app_list.sort(
+        key=lambda a: APPS_ORDER.index(a["name"]) if a["name"] in APPS_ORDER else 999
+    )
+
+    # Сортировка моделей внутри каждого приложения
+    for app in app_list:
+        order = MODELS_ORDER.get(app["name"])
+        if order:
+            app["models"].sort(
+                key=lambda m: order.index(m["object_name"]) if m["object_name"] in order else 999
+            )
+        else:
+            # дефолт — алфавит по verbose_name модели
+            app["models"].sort(key=lambda m: m["name"])
+    return app_list
+
+# Подменяем метод у текущего admin.site
+admin.site.get_app_list = MethodType(_get_app_list_ordered, admin.site)
