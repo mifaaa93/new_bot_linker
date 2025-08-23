@@ -67,6 +67,38 @@ class User(models.Model):
         return f"{self.first_name}"
 
 
+class Admin(models.Model):
+    '''
+    Админы бота
+    '''
+    class Meta:
+        abstract = False
+        verbose_name = "Админ телеграм"
+        verbose_name_plural = "Админ телеграм"
+
+    user_id = models.IntegerField("ID", primary_key=True, unique=True, editable=True)
+    first_name = models.CharField("Имя", max_length=64, blank=True, null=True, editable=False, default=None)
+    user_name = models.CharField("Юзернейм", max_length=32, blank=True, null=True, editable=False, default=None)
+    last_name = models.CharField("Фамилия", max_length=64, blank=True, null=True, editable=False, default=None)
+
+    registratin_date = models.DateTimeField("Дата Добавления", auto_now_add=True, editable=False)
+    note = models.CharField("Заметка", max_length=128, blank=True, null=True, editable=True, default=None)
+
+    def __str__(self):
+        if self.user_name is not None:
+            s = f"@{self.user_name}"
+        else:
+            s = f"{self.first_name}"
+        
+        return f"{s} {self.user_id}"
+    
+    @property
+    def to_admin(self) -> str:
+        return str(self)
+
+
+
+
 class Link(models.Model):
     '''
     ссылки для вступления в канал

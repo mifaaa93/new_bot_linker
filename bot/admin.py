@@ -8,7 +8,7 @@ from admin_extra_buttons.api import ExtraButtonsMixin, button
 from admin_extra_buttons.utils import HttpResponseRedirectToReferrer
 # Register your models here.
 from re import escape
-from bot.models import User, Link, BaseTable, DaysSummary, Buyer, DaysRangeSummary, LinkFilter
+from bot.models import User, Link, BaseTable, DaysSummary, Buyer, DaysRangeSummary, LinkFilter, Admin
 
 
 
@@ -545,6 +545,27 @@ class LinkFilterAdmin(ExtraButtonsMixin, admin.ModelAdmin):
         return HttpResponseRedirectToReferrer(request)
     
 
+class AdminAdmin(admin.ModelAdmin):
+    
+    readonly_fields = [
+        'first_name',
+        'user_name',
+        'last_name',
+        'registratin_date',
+        ]
+
+    exclude = []
+    search_fields = [
+        'user_id',
+        ]
+    list_display = [
+        'user_id',
+        'first_name',
+        'user_name',
+        'last_name',
+        'registratin_date',
+        'note',
+        ]
 
 
 admin.site.register(Buyer, BuyerAdmin)
@@ -554,3 +575,4 @@ admin.site.register(LinkFilter, LinkFilterAdmin)
 admin.site.register(User, UserAdmin)
 admin.site.register(BaseTable, BaseTableAdmin)
 admin.site.register(DaysRangeSummary, DaysRangeSummaryAdmin)
+admin.site.register(Admin, AdminAdmin)

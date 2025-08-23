@@ -1,5 +1,5 @@
 from telebot import types
-from bot.models import User, Link, BaseTable
+from bot.models import User, Link, BaseTable, Admin
 
 
 
@@ -48,6 +48,14 @@ def get_or_create_link(link: types.ChatInviteLink) -> Link:
     return chat_link
 
 
+def is_admin_in_db(user_id: int) -> bool:
+    """
+    Проверяет, является ли юзер админом в базе.
+    Возвращает True если есть запись в Admin, иначе False.
+    """
+    return Admin.objects.filter(user_id=user_id).exists()
+
+
 def add_to_base_table(user: User, link: Link) -> BaseTable:
     '''
     вносим в базу что юзер вступил в канал
@@ -93,7 +101,6 @@ def turn_off_write(user: User) -> None:
     rows = BaseTable.objects.filter(user=user)
     for row in rows:
         row.make_write(False)
-
 
 
 def turn_on_join_VIP(user: User) -> None:
@@ -173,7 +180,6 @@ def status_users(users: set[str]) -> str:
     return res
 
 
-
 def username_users(users: set[str]) -> str:
     base_counter = 0
     no_base_counter = 0
@@ -209,6 +215,7 @@ def username_users(users: set[str]) -> str:
     
     return res
 
+
 def names_users(users: set[str]) -> str:
     base_counter = 0
     no_base_counter = 0
@@ -243,6 +250,7 @@ def names_users(users: set[str]) -> str:
 
     
     return res
+
 
 def links_users(users: set[str]) -> str:
     '''

@@ -1,6 +1,8 @@
+# bot\bot\bot.py
 import telebot
 from telebot.util import smart_split, antiflood
 from telebot.types import Message, ChatMemberUpdated, CallbackQuery, ChatJoinRequest
+from telebot.apihelper import ApiException
 
 from threading import Thread
 from time import sleep
@@ -24,13 +26,35 @@ bot = telebot.TeleBot(BOT_TOKEN, num_threads=3, parse_mode='HTML', disable_web_p
 
 allowed_updates = ['message', 'chat_member', 'callback_query',]
 
-
+def fetch_user_profile(user_id: int) -> dict | None:
+    """
+    Возвращает словарь {'first_name','last_name','username'}
+    или None, если бот не может получить профиль (пользователь
+    не писал боту/ошибка доступа и т.п.).
+    """
+    try:
+        ch = bot.get_chat(user_id)
+        return {
+            "first_name": ch.first_name,
+            "last_name": ch.last_name,
+            "username": ch.username,
+        }
+    except ApiException:
+        return None
+    except Exception:
+        return None
 
 def is_admin(message: Message) -> bool:
     '''
     проверка админ или нет
     '''
-    return message.from_user.id in ADMINS 
+    uid = message.from_user.id
+    return uid in ADMINS or is_admin_in_db(uid)
+
+def is_admin_cb(call: CallbackQuery) -> bool:
+
+    uid = call.from_user.id
+    return uid in ADMINS or is_admin_in_db(uid)
 
 
 def is_target_channel(chat_member: ChatMemberUpdated|ChatJoinRequest) -> bool:
@@ -311,7 +335,7 @@ def admin_btn(message: Message) -> None:
         main_menu(message)
 
 
-@bot.callback_query_handler(func=is_admin)
+@bot.callback_query_handler(func=is_admin_cb)
 def query_handler(call: CallbackQuery):
 
     chat_id = call.message.chat.id
@@ -321,5 +345,4 @@ def query_handler(call: CallbackQuery):
         bot.clear_step_handler_by_chat_id(chat_id)
         bot.delete_message(chat_id, msg_id)
         main_menu(call.message)
-
 
